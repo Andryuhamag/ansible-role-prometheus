@@ -1,0 +1,42 @@
+---
+- name: "Get and install prometheus"
+  block:
+
+  - name: "Get checksum list"
+    ansible.builtin.set_fact:
+      prometheus_checksums_fact: "{{ lookup('url', prometheus_checksum_url, wantlist=True) | list }}"
+    run_once: true
+    until: prometheus_checksums_fact is search('linux-' + arch + '.tar.gz')
+    retries: 5
+
+  - name: "Get checksum"
+    ansible.builtin.set_fact:
+      prometheus_checksum_fact: "{{ item.split(' ')[0] }}"
+    with_items: "{{ prometheus_checksums_fact }}"
+    when:
+      - "('linux-' + arch + '.tar.gz') in item"
+
+  - name: "Download prometheus binary"
+    become: false
+    ansible.builtin.get_url:
+      url: "{{ prometheus_url }}"
+      dest: "/tmp/{{ prometheus_archive }}"
+      mode: 0644
+      checksum: "sha256:{{ prometheus_checksum_fact }}"
+    retries: 5
+    delay: 2
+    delegate_to: localhost
+
+  - name: "Copy prometheus to server"
+    ansible.builtin.copy:
+      src: "/tmp/{{ prometheus_archive }}"
+      dest: "/tmp/{{ prometheus_archive }}"
+
+
+  - name: "Unarchive prometheus"
+    become: false
+    ansible.builtin.unarchive:
+      src: "/tmp/{{ prometheus_archive }}"
+      dest: "/tmp"
+      creates: "/tmp/prometheus"
+#    delegate_to: localhost
