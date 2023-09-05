@@ -1,4 +1,39 @@
 ---
+- name: "Prepare steps"
+  block:
+
+  - name: "Add prometheus group"
+    ansible.builtin.group:
+      name: prometheus
+      state: present
+      system: true
+
+  - name: "Add prometheus user"
+    ansible.builtin.user:
+      name: prometheus
+      group: prometheus
+      home: "{{ prometheus_db_dir }}"
+      createhome: false
+      system: true
+      shell: "/usr/bin/nologin"
+
+  - name: "Create config dir"
+    ansible.builtin.file:
+      path: "{{ prometheus_config_dir }}"
+      state: directory
+      owner: prometheus
+      group: prometheus
+      mode: 0755
+
+  - name: "Create data dir"
+    ansible.builtin.file:
+      path: "{{ prometheus_db_dir }}"
+      state: directory
+      owner: prometheus
+      group: prometheus
+      mode: 0755
+
+
 - name: "Get and install prometheus"
   block:
 
@@ -9,7 +44,7 @@
     until: prometheus_checksums_fact is search('linux-' + arch + '.tar.gz')
     retries: 5
 
-  - name: "Get checksum"
+  - name: "Get checksum to check target archive"
     ansible.builtin.set_fact:
       prometheus_checksum_fact: "{{ item.split(' ')[0] }}"
     with_items: "{{ prometheus_checksums_fact }}"
@@ -27,16 +62,33 @@
     delay: 2
     delegate_to: localhost
 
-  - name: "Copy prometheus to server"
-    ansible.builtin.copy:
-      src: "/tmp/{{ prometheus_archive }}"
-      dest: "/tmp/{{ prometheus_archive }}"
-
-
   - name: "Unarchive prometheus"
     become: false
     ansible.builtin.unarchive:
       src: "/tmp/{{ prometheus_archive }}"
-      dest: "/tmp"
-      creates: "/tmp/prometheus"
-#    delegate_to: localhost
+      dest: "/tmp/"
+    delegate_to: localhost
+
+  - name: "Copy prometheus and promtool binaries to server"
+    ansible.builtin.copy:
+      src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ arch }}/{{ item }}"
+      dest: "{{ prometheus_install_dir }}/{{ item }}"
+      mode: 0755
+      owner: root
+      group: root
+    with_items:
+      - prometheus
+      - promtool
+
+  - name: "Copy default console to server"
+    ansible.builtin.copy:
+      src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ arch }}/{{ item }}"
+      dest: "{{ prometheus_config_dir }}/{{ item }}"
+      mode: 0755
+      owner: root
+      group: root
+    with_items:
+      - consoles
+      - console_libraries
+
+
