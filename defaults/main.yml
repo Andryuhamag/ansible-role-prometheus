@@ -9,5 +9,6 @@ prometheus_checksum_url: "https://github.com/prometheus/prometheus/releases/down
 
 prometheus_install_dir: "/usr/local/bin"
 prometheus_config_dir: "/etc/prometheus"
+prometheus_config_file: "prometheus.yml.j2"
 prometheus_db_dir: "/var/lib/prometheus"
 
