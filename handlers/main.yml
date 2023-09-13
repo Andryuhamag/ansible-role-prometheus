@@ -6,3 +6,9 @@
       daemon_reload: true
       name: prometheus
       state: restarted
+
+  - name: "Reload Prometheus"
+    become: true
+    ansible.builtin.systemd:
+      name: prometheus
+      state: reloaded

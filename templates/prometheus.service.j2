@@ -3,9 +3,12 @@ Description=Prometheus
 
 [Service]
 Type=simple
-#User=prometheus
-#Group=prometheus
-ExecStart={{ prometheus_install_dir }}/prometheus --config.file={{ prometheus_config_dir }}/prometheus.yml
+User=prometheus
+Group=prometheus
+ExecStart={{ prometheus_install_dir }}/prometheus \
+         --config.file={{ prometheus_config_dir }}/prometheus.yml \
+         --storage.tsdb.path={{ prometheus_db_dir }}
+ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 
 [Install]

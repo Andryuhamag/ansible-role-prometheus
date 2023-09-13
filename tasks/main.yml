@@ -98,6 +98,8 @@
       owner: root
       group: prometheus
       mode: 0640
+    notify:
+      "Reload Prometheus"
 
   - name: "Copy systemd unit"
     ansible.builtin.template:
