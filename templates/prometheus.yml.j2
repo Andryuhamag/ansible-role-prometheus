@@ -2,6 +2,7 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
+
 {% if prometheus_alertmanager_enabled == true %}
 # Alertmanager configuration
 alerting:
@@ -9,20 +10,17 @@ alerting:
     - static_configs:
         - targets:
            - alertmanager:9093
+
 {% endif %}
-
-# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
-#rule_files:
-  # - "first_rules.yml"
-  # - "second_rules.yml"
-
 # scrape configuration
 scrape_configs:
 
+{% if prometheus_default_exporter == true %}
   - job_name: "prometheus"
     static_configs:
       - targets: ["localhost:9090"]
 
+{% endif %}
   - job_name: "node exporter"
     static_configs:
-      - targets: ["localhost:9100"]
+      - targets: ["{{ prometheus_node_exporter_host }}:9100"]
