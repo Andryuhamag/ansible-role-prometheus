@@ -110,3 +110,11 @@
       mode: 0644
     notify:
       "Restart Prometheus"
+
+  - name: "Start and enabled Prometheus service"
+    become: true
+    ansible.builtin.systemd:
+      daemon_reload: true
+      name: prometheus
+      state: started
+      enabled: true

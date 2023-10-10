@@ -12,3 +12,5 @@ prometheus_config_dir: "/etc/prometheus"
 prometheus_config_file: "prometheus.yml.j2"
 prometheus_db_dir: "/var/lib/prometheus"
 
+# prometheus.yml parameters
+prometheus_alertmanager_enabled: "false"
