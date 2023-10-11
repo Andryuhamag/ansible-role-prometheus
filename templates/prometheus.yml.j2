@@ -18,9 +18,13 @@ scrape_configs:
 {% if prometheus_default_exporter == true %}
   - job_name: "prometheus"
     static_configs:
-      - targets: ["localhost:9090"]
+      - targets:
+        - localhost:9090
 
 {% endif %}
   - job_name: "node exporter"
     static_configs:
-      - targets: ["{{ prometheus_node_exporter_host }}:9100"]
+      - targets:
+{% for prometheus_node_exporter_host in prometheus_node_exporter_hosts %}
+        - {{ prometheus_node_exporter_host }}:{{ prometheus_node_exporter_port }}
+{% endfor %}
