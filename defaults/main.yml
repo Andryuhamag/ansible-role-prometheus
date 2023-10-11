@@ -15,6 +15,6 @@ prometheus_db_dir: "/var/lib/prometheus"
 # prometheus.yml parameters
 prometheus_alertmanager_enabled: "false"
 prometheus_default_exporter: "false"
-prometheus_node_expotret_host: ""
+prometheus_node_exporter_host: "127.0.0.1"
 prometheus_node_exporter_port: "9100"
 
