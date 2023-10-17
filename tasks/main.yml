@@ -2,13 +2,13 @@
 - name: "Prepare steps"
   block:
 
-  - name: "Add prometheus group"
+  - name: "Add Prometheus group"
     ansible.builtin.group:
       name: prometheus
       state: present
       system: true
 
-  - name: "Add prometheus user"
+  - name: "Add Prometheus user"
     ansible.builtin.user:
       name: prometheus
       group: prometheus
@@ -34,7 +34,7 @@
       mode: 0755
 
 
-- name: "Get and install prometheus"
+- name: "Get and install Prometheus"
   block:
 
   - name: "Get checksum list"
@@ -51,7 +51,7 @@
     when:
       - "('linux-' + arch + '.tar.gz') in item"
 
-  - name: "Download prometheus binary"
+  - name: "Download Prometheus binary"
     become: false
     ansible.builtin.get_url:
       url: "{{ prometheus_url }}"
@@ -62,14 +62,14 @@
     delay: 2
     delegate_to: localhost
 
-  - name: "Unarchive prometheus"
+  - name: "Unarchive Prometheus"
     become: false
     ansible.builtin.unarchive:
       src: "/tmp/{{ prometheus_archive }}"
       dest: "/tmp/"
     delegate_to: localhost
 
-  - name: "Copy prometheus and promtool binaries to server"
+  - name: "Copy Prometheus and Promtool binaries to server"
     ansible.builtin.copy:
       src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ arch }}/{{ item }}"
       dest: "{{ prometheus_install_dir }}/{{ item }}"
@@ -91,7 +91,7 @@
       - consoles
       - console_libraries
 
-  - name: "Copy prometheus config file to server"
+  - name: "Copy Prometheus config file to server"
     ansible.builtin.template:
       src: "{{ prometheus_config_file }}"
       dest: "{{ prometheus_config_dir }}/prometheus.yml"
@@ -99,7 +99,7 @@
       group: prometheus
       mode: 0640
     notify:
-      "Reload Prometheus"
+      "reload prometheus"
 
   - name: "Copy systemd unit"
     ansible.builtin.template:
@@ -109,11 +109,10 @@
       group: root
       mode: 0644
     notify:
-      "Restart Prometheus"
+      "restart prometheus"
 
   - name: "Start and enabled Prometheus service"
-    become: true
-    ansible.builtin.systemd:
+    ansible.builtin.service:
       daemon_reload: true
       name: prometheus
       state: started

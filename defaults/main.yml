@@ -1,5 +1,4 @@
 ---
-# defaults file for ansible-role-prometheus
 arch: "amd64"
 #lts "2.45.0"
 prometheus_version: "2.45.0"
@@ -13,8 +12,9 @@ prometheus_config_file: "prometheus.yml.j2"
 prometheus_db_dir: "/var/lib/prometheus"
 
 # prometheus.yml parameters
-prometheus_alertmanager_enabled: "false"
-prometheus_default_exporter: "false"
+prometheus_alertmanager_enabled: false
+prometheus_alertmanager_host: "localhost"
+prometheus_alertmanager_port: "9093"
 prometheus_node_exporter_hosts:
   - 127.0.0.1
 prometheus_node_exporter_port: "9100"
