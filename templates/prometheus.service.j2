@@ -3,8 +3,8 @@ Description=Prometheus
 
 [Service]
 Type=simple
-User=prometheus
-Group=prometheus
+User={{ prometheus_user }}
+Group={{ prometheus_group }}
 ExecStart={{ prometheus_install_dir }}/prometheus \
          --config.file={{ prometheus_config_dir }}/prometheus.yml \
          --storage.tsdb.path={{ prometheus_db_dir }}

@@ -6,9 +6,12 @@ prometheus_archive: "prometheus-{{ prometheus_version }}.linux-{{ arch }}.tar.gz
 prometheus_url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/{{ prometheus_archive }}"
 prometheus_checksum_url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/sha256sums.txt"
 
+prometheus_user: "prometheus"
+prometheus_group: "prometheus"
+
 prometheus_install_dir: "/usr/local/bin"
 prometheus_config_dir: "/etc/prometheus"
-prometheus_config_file: "prometheus.yml.j2"
+prometheus_config_templ: "prometheus.yml.j2"
 prometheus_db_dir: "/var/lib/prometheus"
 
 # prometheus.yml parameters

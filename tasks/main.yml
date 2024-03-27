@@ -4,14 +4,14 @@
 
   - name: "Add Prometheus group"
     ansible.builtin.group:
-      name: prometheus
+      name: "{{ prometheus_group }}"
       state: present
       system: true
 
   - name: "Add Prometheus user"
     ansible.builtin.user:
-      name: prometheus
-      group: prometheus
+      name: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
       home: "{{ prometheus_db_dir }}"
       createhome: false
       system: true
@@ -21,16 +21,16 @@
     ansible.builtin.file:
       path: "{{ prometheus_config_dir }}"
       state: directory
-      owner: prometheus
-      group: prometheus
+      owner: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
       mode: 0755
 
   - name: "Create data dir"
     ansible.builtin.file:
       path: "{{ prometheus_db_dir }}"
       state: directory
-      owner: prometheus
-      group: prometheus
+      owner: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
       mode: 0755
 
 
@@ -74,8 +74,8 @@
       src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ arch }}/{{ item }}"
       dest: "{{ prometheus_install_dir }}/{{ item }}"
       mode: 0755
-      owner: root
-      group: root
+      owner: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
     with_items:
       - prometheus
       - promtool
@@ -85,18 +85,18 @@
       src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ arch }}/{{ item }}"
       dest: "{{ prometheus_config_dir }}/{{ item }}"
       mode: 0755
-      owner: root
-      group: root
+      owner: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
     with_items:
       - consoles
       - console_libraries
 
   - name: "Copy Prometheus config file to server"
     ansible.builtin.template:
-      src: "{{ prometheus_config_file }}"
+      src: "{{ prometheus_config_templ }}"
       dest: "{{ prometheus_config_dir }}/prometheus.yml"
-      owner: root
-      group: prometheus
+      owner: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
       mode: 0640
     notify:
       "reload prometheus"
