@@ -34,13 +34,12 @@
       mode: 0755
 
 
-- name: "Get and install Prometheus"
+- name: "Get and unarchive Prometheus"
   block:
 
   - name: "Get checksum list"
     ansible.builtin.set_fact:
       prometheus_checksums_fact: "{{ lookup('url', prometheus_checksum_url, wantlist=True) | list }}"
-    run_once: true
     until: prometheus_checksums_fact is search('linux-' + arch + '.tar.gz')
     retries: 5
 
@@ -60,14 +59,18 @@
       checksum: "sha256:{{ prometheus_checksum_fact }}"
     retries: 5
     delay: 2
-    delegate_to: localhost
 
   - name: "Unarchive Prometheus"
     become: false
     ansible.builtin.unarchive:
       src: "/tmp/{{ prometheus_archive }}"
       dest: "/tmp/"
-    delegate_to: localhost
+
+  run_once: true
+  delegate_to: localhost
+
+- name: "Install Prometheus on target servers"
+  block:
 
   - name: "Copy Prometheus and Promtool binaries to server"
     ansible.builtin.copy:
@@ -108,12 +111,13 @@
       owner: root
       group: root
       mode: 0644
-    notify:
-      "restart prometheus"
 
-  - name: "Start and enabled Prometheus service"
-    ansible.builtin.service:
-      daemon_reload: true
-      name: prometheus
-      state: started
-      enabled: true
+  notify:
+    "restart prometheus"
+
+- name: "Start and enabled Prometheus service"
+  ansible.builtin.service:
+    daemon_reload: true
+    name: prometheus
+    state: started
+    enabled: true
