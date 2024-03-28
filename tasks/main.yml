@@ -101,8 +101,6 @@
       owner: "{{ prometheus_user }}"
       group: "{{ prometheus_group }}"
       mode: 0640
-    notify:
-      "reload prometheus"
 
   - name: "Copy systemd unit"
     ansible.builtin.template:
